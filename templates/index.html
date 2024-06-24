@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Price Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #222;
+            color: #fff;
+        }
+        /* Adjust label color for dark mode */
+        body.dark-mode label {
+            color: #fff;
+        }
+        /* Add other dark mode styles for specific elements if needed */
+    </style>
+</head>
+<body>
+    <h1>Best Price Recommender</h1>
+    <button id="dark-mode-toggle">Toggle Dark Mode</button>
+    <form class="product-price-form" action="/add_product" method="post">
+        <div class="product-url-input">
+            <label for="product_url" style="color: aqua;">Product URL:</label><br>
+            <input type="text" id="product_url" name="product_url"><br>
+        </div>
+        <div class="price-input">
+            <label for="target_price" style="color: aqua;">Target Price:</label><br>
+            <input type="number" id="target_price" name="target_price" step="0.01"><br><br>
+        </div>
+        <div class="add-button">
+            <button type="submit">Add Product</button>
+        </div>
+    </form>
+    <form action="/update_prices" method="post">
+        <button class="update-button" type="submit" formaction="/update_prices">Update Prices</button>
+    </form>
+    <h2>Tracked Products:</h2>
+    <div class="product-container">
+        {% for product in products %}
+        <div class="product">
+            <div class="name">{{ product.name }}</div>
+            <img src="{{ product.image_url }}" alt="Product Image">
+            <div class="price {% if product.price_comparison == 'lower' %}below-target{% elif product.price_comparison == 'higher' %}above-target{% endif %}">
+                Current Price: Rs {{ product.price }}
+            </div>
+            <div class="target-price">Target Price: Rs {{ product.target_price }}</div>
+            <div class="delete-button">
+                <form action="/delete_product" method="post">
+                    <input type="hidden" name="product_id" value="{{ product.doc_id }}">
+                    <button type="submit">Delete</button>
+                </form>
+            </div>
+            <div class="view-product">
+                <a href="{{ product.url }}" target="_blank">View Product</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Toggle dark mode
+            $("#dark-mode-toggle").click(function() {
+                $("body").toggleClass("dark-mode");
+            });
+        });
+    </script>
+</body>
+</html>
